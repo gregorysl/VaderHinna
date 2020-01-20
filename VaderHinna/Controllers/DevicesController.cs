@@ -39,7 +39,7 @@ namespace VaderHinna.Controllers
                 .Single(x => x.Id == deviceId).Sensors.Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
             foreach (var sensorName in sensorsToDownload)
             {
-                var newUri = azureCache.File.Uri.ToString().Replace("metadata", $"{deviceId}/{sensorName}/{date}");
+                var newUri = $"{azureCache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
                 var sensordata = await Connector.DownloadDeviceDataForSensor(new Uri(newUri));
             }
             return $"Hello World!{deviceId} {date} {sensor}";

@@ -18,11 +18,11 @@ namespace VaderHinna.AzureService
         private string _name = "iotbackend";
         private string _filename = "metadata.csv";
         private readonly CloudBlobClient _cloudBlobClient;
-        private readonly Uri _baseUri;
+        private readonly string _baseUrl;
         public AzureConnector(string connectionString)
         {
             var storageAccount = CloudStorageAccount.Parse(connectionString);
-            _baseUri = storageAccount.BlobStorageUri.PrimaryUri;
+            _baseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri}{_name}";
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
         }
         
@@ -53,7 +53,7 @@ namespace VaderHinna.AzureService
             var devicesList = csv.GetRecords<DeviceSensorData>()
                 .GroupBy(x => x.DeviceId)
                 .Select(x => new AzureDevice { Id = x.Key, Sensors = x.Select(z => z.Sensor).ToList() }).ToList();
-            return new AzureCache { File = file, Devices = devicesList };
+            return new AzureCache { BaseUrl = _baseUrl, File = file, Devices = devicesList };
         }
 
         private static async Task<BlobResultSegment> GetFilesFromDirectory(CloudBlobClient cloudBlobClient, string name)

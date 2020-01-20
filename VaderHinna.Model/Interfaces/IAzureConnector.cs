@@ -10,7 +10,7 @@ namespace VaderHinna.AzureService
         Task<AzureCache> DiscoveryMode();
         Task<string> DownloadTextByBlobUri(Uri uri);
         Task<string> DownloadTextByAppendUri(Uri uri);
-        Task<List<DeviceData>> DownloadDeviceDataForSensor(Uri uri);
+        Task<List<SensorData>> DownloadDeviceDataForSensor(Uri uri);
         Task<bool> CheckBlobUrlExist(Uri uri);
     }
 }

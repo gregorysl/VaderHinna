@@ -26,4 +26,16 @@ namespace VaderHinna.Model
         public AzureFile File { get; set; }
         public List<AzureDevice> Devices { get; set; }
     }
+    
+    public class MetadataInfo
+    {
+        public string DeviceId { get; set; }
+        public string Sensor { get; set; }
+    }
+    
+    public class SensorData
+    {
+        public DateTime Date { get; set; }
+        public float Value { get; set; }
+    }
 }

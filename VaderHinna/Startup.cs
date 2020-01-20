@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VaderHinna.AzureService;
+using VaderHinna.Model.Interfaces;
 
 namespace VaderHinna
 {
@@ -21,7 +22,8 @@ namespace VaderHinna
             var connectionString = Configuration["ConnectionString"];
             services.AddControllers();
             services.AddApiVersioning();
-            services.AddTransient<IAzureConnector>(s => new AzureConnector(connectionString));
+            services.AddTransient<ICsvService, CsvService>();
+            services.AddTransient<IAzureConnector>(s => new AzureConnector(connectionString, s.GetService<ICsvService>()));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

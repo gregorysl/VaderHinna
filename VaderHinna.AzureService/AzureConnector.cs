@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using CsvHelper;
-using CsvHelper.Configuration;
-using CsvHelper.Configuration.Attributes;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using VaderHinna.Model;
+using VaderHinna.Model.Interfaces;
 
 namespace VaderHinna.AzureService
 {
@@ -18,9 +14,11 @@ namespace VaderHinna.AzureService
         private string _name = "iotbackend";
         private string _filename = "metadata.csv";
         private readonly CloudBlobClient _cloudBlobClient;
+        private readonly ICsvService _csvService;
         private readonly string _baseUrl;
-        public AzureConnector(string connectionString)
+        public AzureConnector(string connectionString, ICsvService csvService)
         {
+            _csvService = csvService;
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             _baseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri}{_name}";
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
@@ -47,14 +45,10 @@ namespace VaderHinna.AzureService
         private async Task<AzureCache> CreateCache(AzureFile file)
         {
             var converted = await DownloadTextByBlobUri(file.Uri);
-            using var csv = new CsvReader(new StringReader(converted), CultureInfo.InvariantCulture);
-            csv.Configuration.HasHeaderRecord = false;
-            csv.Configuration.Delimiter = ";";
-            var devicesList = csv.GetRecords<DeviceSensorData>()
-                .GroupBy(x => x.DeviceId)
-                .Select(x => new AzureDevice { Id = x.Key, Sensors = x.Select(z => z.Sensor).ToList() }).ToList();
+            var devicesList = _csvService.ParseMetadataInfoForDevices(converted);
             return new AzureCache { BaseUrl = _baseUrl, File = file, Devices = devicesList };
         }
+
 
         private static async Task<BlobResultSegment> GetFilesFromDirectory(CloudBlobClient cloudBlobClient, string name)
         {
@@ -76,14 +70,10 @@ namespace VaderHinna.AzureService
             return content;
         }
 
-        public async Task<List<DeviceData>> DownloadDeviceDataForSensor(Uri uri)
+        public async Task<List<SensorData>> DownloadDeviceDataForSensor(Uri uri)
         {
             var data = await DownloadTextByAppendUri(uri);
-            using var csv = new CsvReader(new StringReader(data), CultureInfo.InvariantCulture);
-            csv.Configuration.HasHeaderRecord = false;
-            csv.Configuration.RegisterClassMap<FooMap>();
-            csv.Configuration.Delimiter = ";";
-            var devicesList = csv.GetRecords<DeviceData>().ToList();
+            var devicesList = _csvService.ReadAndParseSensorData(data);
             return devicesList;
         }
 
@@ -91,31 +81,6 @@ namespace VaderHinna.AzureService
         {
             var cloudBlob = new CloudBlob(uri);
             return await cloudBlob.ExistsAsync();
-        }
-    }
-    public class DeviceSensorData
-    {
-        [Index(0)]
-        public string DeviceId { get; set; }
-
-        [Index(1)]
-        public string Sensor { get; set; }
-    }
-    
-    public class DeviceData
-    {
-        [Index(0)]
-        public DateTime Date { get; set; }
-
-        [Index(1)]
-        public float Value { get; set; }
-    }
-    public sealed class FooMap : ClassMap<DeviceData>
-    {
-        public FooMap()
-        {
-            Map(m => m.Date).Index(0);
-            Map(m => m.Value).TypeConverterOption.CultureInfo(new CultureInfo("pl-PL"));
         }
     }
 }

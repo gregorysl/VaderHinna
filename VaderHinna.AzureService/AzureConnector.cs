@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using VaderHinna.Model;
-using VaderHinna.Model.Interfaces;
+using VaderHinna.Model.Interface;
 
 namespace VaderHinna.AzureService
 {

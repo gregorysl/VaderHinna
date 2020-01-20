@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using VaderHinna.AzureService;
+using VaderHinna.Model.Interface;
 
 namespace VaderHinna.Controllers
 {

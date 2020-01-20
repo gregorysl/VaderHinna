@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using VaderHinna.Model;
 
-namespace VaderHinna.AzureService
+namespace VaderHinna.Model.Interface
 {
     public interface IAzureConnector
     {

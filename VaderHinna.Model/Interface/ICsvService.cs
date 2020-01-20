@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace VaderHinna.Model.Interfaces
+namespace VaderHinna.Model.Interface
 {
     public interface ICsvService
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using CsvHelper;
 using CsvHelper.Configuration;
 using VaderHinna.Model;
-using VaderHinna.Model.Interfaces;
+using VaderHinna.Model.Interface;
 
 namespace VaderHinna.AzureService
 {
@@ -15,8 +15,8 @@ namespace VaderHinna.AzureService
         {
             using var csv = new CsvReader(new StringReader(data), CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
-            csv.Configuration.RegisterClassMap<SensorDataMap>();
             csv.Configuration.Delimiter = ";";
+            csv.Configuration.RegisterClassMap<SensorDataMap>();
             var devicesList = csv.GetRecords<SensorData>().ToList();
             return devicesList;
         }
@@ -26,6 +26,7 @@ namespace VaderHinna.AzureService
             using var csv = new CsvReader(new StringReader(converted), CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
             csv.Configuration.Delimiter = ";";
+            csv.Configuration.RegisterClassMap<MetadataInfoMap>();
             var devicesList = csv.GetRecords<MetadataInfo>()
                 .GroupBy(x => x.DeviceId)
                 .Select(x => new AzureDevice {Id = x.Key, Sensors = x.Select(z => z.Sensor).ToList()}).ToList();
@@ -38,6 +39,14 @@ namespace VaderHinna.AzureService
         {
             Map(m => m.Date).Index(0);
             Map(m => m.Value).Index(1).TypeConverterOption.CultureInfo(new CultureInfo("pl-PL"));
+        }
+    }
+    public sealed class MetadataInfoMap : ClassMap<MetadataInfo>
+    {
+        public MetadataInfoMap()
+        {
+            Map(m => m.DeviceId).Index(0);
+            Map(m => m.Sensor).Index(1);
         }
     }
 }

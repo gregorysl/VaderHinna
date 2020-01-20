@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -26,13 +28,13 @@ namespace VaderHinna.Controllers
 
         [HttpGet]
         [Route("{deviceId}/[action]/{date}/{sensor?}")]
-        public async Task<Dictionary<string, List<SensorData>>> Data(string deviceId, string date, string sensor)
+        public async Task<ActionResult> Data(string deviceId, string date, string sensor)
         {
             var errorMessage = ParametersValidator(deviceId, date, sensor);
             if (!string.IsNullOrEmpty(errorMessage))
             {
                 _logger.LogError(errorMessage, deviceId, date, sensor);
-                return null;//errorMessage;
+                return BadRequest(errorMessage);
             }
 
             var azureCache = Connector.DiscoveryMode().Result;
@@ -51,8 +53,7 @@ namespace VaderHinna.Controllers
                 result.Add(sensorName,dataForSensor);
             }
 
-            return result;
-            //return $"Hello World!{deviceId} {date} {sensor}";
+            return Ok(result);
         }
 
         private string ParametersValidator(string deviceId, string dateString, string sensor)

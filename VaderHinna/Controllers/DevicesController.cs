@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -25,7 +26,7 @@ namespace VaderHinna.Controllers
 
         [HttpGet]
         [Route("{deviceId}/[action]/{date}/{sensor?}")]
-        public string Data(string deviceId, string date, string sensor)
+        public async Task<string> Data(string deviceId, string date, string sensor)
         {
             var (isValid, errorMessage) = ParametersValidator(deviceId, date, sensor);
             if (!isValid)
@@ -33,8 +34,14 @@ namespace VaderHinna.Controllers
                 return errorMessage;
             }
 
-            var sensorsToDownload = Connector.DiscoveryMode().Result.Devices
+            var azureCache = Connector.DiscoveryMode().Result;
+            var sensorsToDownload = azureCache.Devices
                 .Single(x => x.Id == deviceId).Sensors.Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
+            foreach (var sensorName in sensorsToDownload)
+            {
+                var newUri = azureCache.File.Uri.ToString().Replace("metadata", $"{deviceId}/{sensorName}/{date}");
+                var sensordata = await Connector.DownloadDeviceDataForSensor(new Uri(newUri));
+            }
             return $"Hello World!{deviceId} {date} {sensor}";
         }
 
@@ -52,7 +59,7 @@ namespace VaderHinna.Controllers
             var isValidSensor = string.IsNullOrEmpty(sensor) ||
                                  azureCache.Devices.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
             if (!isValidSensor) return new KeyValuePair<bool, string>(false, "Sensor not recognized for this device");
-
+            
             return new KeyValuePair<bool, string>(true, null);
         }
     }

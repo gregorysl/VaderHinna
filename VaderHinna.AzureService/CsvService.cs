@@ -21,9 +21,11 @@ namespace VaderHinna.AzureService
             return devicesList;
         }
 
-        public List<AzureDevice> ParseMetadataInfoForDevices(string converted)
+        public List<AzureDevice> ParseMetadataInfoFromStream(Stream stream)
         {
-            using var csv = new CsvReader(new StringReader(converted), CultureInfo.InvariantCulture);
+            stream.Position = 0;
+            StreamReader streamReader = new StreamReader(stream);
+            using var csv = new CsvReader(streamReader, CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
             csv.Configuration.Delimiter = ";";
             csv.Configuration.RegisterClassMap<MetadataInfoMap>();

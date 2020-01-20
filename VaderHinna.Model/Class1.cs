@@ -6,7 +6,7 @@ namespace VaderHinna.Model
     public class AzureFile
     {
         public string Name { get; set; }
-        public int Length { get; set; }
+        public long Length { get; set; }
         public Uri Uri { get; set; }
     }
     public class AzureDir

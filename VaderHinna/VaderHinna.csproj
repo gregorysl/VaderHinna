@@ -10,4 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VaderHinna.AzureService\VaderHinna.AzureService.csproj" />
+  </ItemGroup>
 </Project>

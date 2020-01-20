@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CsvHelper.Configuration.Attributes;
 
-namespace VaderHinna
+namespace VaderHinna.Model
 {
     public class AzureFile
     {
@@ -14,14 +13,6 @@ namespace VaderHinna
     {
         public string Path { get; set; }
         public List<string> Files { get; set; }
-    }
-    public class DeviceSensorData
-    {
-        [Index(0)]
-        public string DeviceId { get; set; }
-
-        [Index(1)]
-        public string Sensor { get; set; }
     }
 
     public class AzureDevice

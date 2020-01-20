@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -28,7 +26,7 @@ namespace VaderHinna.Controllers
 
         [HttpGet]
         [Route("{deviceId}/[action]/{date}/{sensor?}")]
-        public async Task<ActionResult> Data(string deviceId, string date, string sensor)
+        public async Task<IActionResult> Data(string deviceId, string date, string sensor)
         {
             var errorMessage = ParametersValidator(deviceId, date, sensor);
             if (!string.IsNullOrEmpty(errorMessage))
@@ -47,7 +45,9 @@ namespace VaderHinna.Controllers
                 var newUri = $"{azureCache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
                 if (!await Connector.BlobForUrlExist(new Uri(newUri)))
                 {
-                    break;
+                    var error = "Requested data doesn't exist";
+                    _logger.LogError(error, newUri);
+                    return NotFound(error);
                 }
                 var dataForSensor = await Connector.DownloadDeviceDataForSensor(new Uri(newUri));
                 result.Add(sensorName,dataForSensor);

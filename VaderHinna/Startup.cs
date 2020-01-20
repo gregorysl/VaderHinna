@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using VaderHinna.AzureService;
 
 namespace VaderHinna
 {
@@ -17,8 +18,10 @@ namespace VaderHinna
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var connectionString = Configuration["ConnectionString"];
             services.AddControllers();
             services.AddApiVersioning();
+            services.AddTransient<IAzureConnector>(s => new AzureConnector(connectionString));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -4,29 +4,25 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
-using Microsoft.Extensions.Configuration;
+using CsvHelper.Configuration.Attributes;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using VaderHinna.Model;
 
-namespace VaderHinna
+namespace VaderHinna.AzureService
 {
-    public class AzureConnector
+    public class AzureConnector : IAzureConnector
     {
         private string _name = "iotbackend";
         private string _filename = "metadata.csv";
         private readonly CloudBlobClient _cloudBlobClient;
-        public AzureConnector(IConfiguration configuration)
+        public AzureConnector(string connectionString)
         {
-            Configuration = configuration;
-            
-            var connectionstring = Configuration["ConnectionString"];
-            var storageAccount = CloudStorageAccount.Parse(connectionstring);
+            var storageAccount = CloudStorageAccount.Parse(connectionString);
 
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
         }
-
-        public IConfiguration Configuration { get; }
-
+        
         public async Task<AzureCache> DiscoveryMode()
         {
             var list = await GetFilesFromDirectory(_cloudBlobClient, _name);
@@ -45,9 +41,10 @@ namespace VaderHinna
             return null;
 
         }
-        private static async Task<AzureCache> CreateCache(AzureFile file)
+        
+        private async Task<AzureCache> CreateCache(AzureFile file)
         {
-            var converted = await DownloadStringByBlobName(file.Uri);
+            var converted = await DownloadTextByUri(file.Uri);
             using var csv = new CsvReader(new StringReader(converted), CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
             csv.Configuration.Delimiter = ";";
@@ -64,11 +61,19 @@ namespace VaderHinna
             return list;
         }
 
-        private static async Task<string> DownloadStringByBlobName(Uri uri)
+        public async Task<string> DownloadTextByUri(Uri uri)
         {
             var blob = new CloudBlockBlob(uri);
             var content = await blob.DownloadTextAsync();
             return content;
         }
+    }
+    public class DeviceSensorData
+    {
+        [Index(0)]
+        public string DeviceId { get; set; }
+
+        [Index(1)]
+        public string Sensor { get; set; }
     }
 }

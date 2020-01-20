@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using VaderHinna.AzureService;
 
 namespace VaderHinna.Controllers
 {
@@ -14,11 +15,11 @@ namespace VaderHinna.Controllers
     public class DevicesController : ControllerBase
     {
         private readonly ILogger<DevicesController> _logger;
-        private IConfiguration Configuration { get; }
+        private IAzureConnector Connector { get; }
 
-        public DevicesController(ILogger<DevicesController> logger, IConfiguration configuration)
+        public DevicesController(ILogger<DevicesController> logger, IAzureConnector connector)
         {
-            Configuration = configuration;
+            Connector = connector;
             _logger = logger;
         }
 
@@ -31,6 +32,9 @@ namespace VaderHinna.Controllers
             {
                 return errorMessage;
             }
+
+            var sensorsToDownload = Connector.DiscoveryMode().Result.Devices
+                .Single(x => x.Id == deviceId).Sensors.Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
             return $"Hello World!{deviceId} {date} {sensor}";
         }
 
@@ -41,7 +45,7 @@ namespace VaderHinna.Controllers
             if (!isValidDate) return new KeyValuePair<bool, string>(false, "Date is not in correct format");
             if (date > DateTime.Today) return new KeyValuePair<bool, string>(false, "Date cannot be set in future");
 
-            var azureCache = new AzureConnector(Configuration).DiscoveryMode().Result;
+            var azureCache = Connector.DiscoveryMode().Result;
             var isValidDevice = azureCache.Devices.Any(x => x.Id == deviceId);
             if (!isValidDevice) return new KeyValuePair<bool, string>(false, "Unknown device Id");
 

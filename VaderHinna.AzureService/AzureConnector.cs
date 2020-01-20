@@ -77,7 +77,7 @@ namespace VaderHinna.AzureService
             return devicesList;
         }
 
-        public async Task<bool> CheckBlobUrlExist(Uri uri)
+        public async Task<bool> BlobForUrlExist(Uri uri)
         {
             var cloudBlob = new CloudBlob(uri);
             return await cloudBlob.ExistsAsync();

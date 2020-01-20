@@ -10,6 +10,6 @@ namespace VaderHinna.Model.Interface
         Task<string> DownloadTextByBlobUri(Uri uri);
         Task<string> DownloadTextByAppendUri(Uri uri);
         Task<List<SensorData>> DownloadDeviceDataForSensor(Uri uri);
-        Task<bool> CheckBlobUrlExist(Uri uri);
+        Task<bool> BlobForUrlExist(Uri uri);
     }
 }

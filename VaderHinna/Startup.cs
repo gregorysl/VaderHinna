@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using VaderHinna.AzureService;
+using VaderHinna.Helpers;
 using VaderHinna.Model.Interface;
 
 namespace VaderHinna
@@ -20,7 +21,8 @@ namespace VaderHinna
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration["ConnectionString"];
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+                options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter()));
             services.AddApiVersioning();
             services.AddTransient<ICsvService, CsvService>();
             services.AddTransient<IAzureConnector>(s => new AzureConnector(connectionString, s.GetService<ICsvService>()));

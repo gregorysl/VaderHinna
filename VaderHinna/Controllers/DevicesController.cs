@@ -4,9 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using VaderHinna.AzureService;
+using VaderHinna.Model;
 using VaderHinna.Model.Interface;
 
 namespace VaderHinna.Controllers
@@ -27,41 +26,51 @@ namespace VaderHinna.Controllers
 
         [HttpGet]
         [Route("{deviceId}/[action]/{date}/{sensor?}")]
-        public async Task<string> Data(string deviceId, string date, string sensor)
+        public async Task<Dictionary<string, List<SensorData>>> Data(string deviceId, string date, string sensor)
         {
-            var (isValid, errorMessage) = ParametersValidator(deviceId, date, sensor);
-            if (!isValid)
+            var errorMessage = ParametersValidator(deviceId, date, sensor);
+            if (!string.IsNullOrEmpty(errorMessage))
             {
-                return errorMessage;
+                _logger.LogError(errorMessage, deviceId, date, sensor);
+                return null;//errorMessage;
             }
 
             var azureCache = Connector.DiscoveryMode().Result;
             var sensorsToDownload = azureCache.Devices
-                .Single(x => x.Id == deviceId).Sensors.Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
+                .Single(x => x.Id == deviceId).Sensors
+                .Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
+            var result = new Dictionary<string, List<SensorData>>();
             foreach (var sensorName in sensorsToDownload)
             {
                 var newUri = $"{azureCache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
-                var sensordata = await Connector.DownloadDeviceDataForSensor(new Uri(newUri));
+                if (!await Connector.BlobForUrlExist(new Uri(newUri)))
+                {
+                    break;
+                }
+                var dataForSensor = await Connector.DownloadDeviceDataForSensor(new Uri(newUri));
+                result.Add(sensorName,dataForSensor);
             }
-            return $"Hello World!{deviceId} {date} {sensor}";
+
+            return result;
+            //return $"Hello World!{deviceId} {date} {sensor}";
         }
 
-        private KeyValuePair<bool, string> ParametersValidator(string deviceId, string dateString, string sensor)
+        private string ParametersValidator(string deviceId, string dateString, string sensor)
         {
             var isValidDate = DateTime.TryParseExact(dateString, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out var date);
-            if (!isValidDate) return new KeyValuePair<bool, string>(false, "Date is not in correct format");
-            if (date > DateTime.Today) return new KeyValuePair<bool, string>(false, "Date cannot be set in future");
+            if (!isValidDate) return "Date is not in correct format";
+            if (date > DateTime.Today) return "Date cannot be set in future";
 
             var azureCache = Connector.DiscoveryMode().Result;
             var isValidDevice = azureCache.Devices.Any(x => x.Id == deviceId);
-            if (!isValidDevice) return new KeyValuePair<bool, string>(false, "Unknown device Id");
+            if (!isValidDevice) return "Unknown device Id";
 
             var isValidSensor = string.IsNullOrEmpty(sensor) ||
                                  azureCache.Devices.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
-            if (!isValidSensor) return new KeyValuePair<bool, string>(false, "Sensor not recognized for this device");
+            if (!isValidSensor) return "Sensor not recognized for this device";
             
-            return new KeyValuePair<bool, string>(true, null);
+            return null;
         }
     }
 }

@@ -35,15 +35,12 @@ namespace VaderHinna.AzureService
 
             var cloudBlobClient = _storageAccount.CreateCloudBlobClient();
             var rootMetadataRef = await cloudBlobClient.GetBlobReferenceFromServerAsync(uri);
-            await rootMetadataRef.FetchAttributesAsync();
                 
             var stream = new MemoryStream();
             await rootMetadataRef.DownloadToStreamAsync(stream);
             var devicesList = _csvService.ParseMetadataInfoFromStream(stream);
-
-            var file = new AzureFile { Length = rootMetadataRef.Properties.Length, Name = rootMetadataRef.Name, Uri = rootMetadataRef.Uri };
-                
-            return new AzureCache { BaseUrl = _baseUrl, File = file, Devices = devicesList };
+    
+            return new AzureCache { BaseUrl = _baseUrl, Devices = devicesList };
         }
 
         public async Task<string> DownloadTextByAppendUri(Uri uri)

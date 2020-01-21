@@ -67,13 +67,14 @@ namespace VaderHinna.Controllers
             foreach (var sensorName in sensorsToDownload)
             {
                 var newUri = $"{Cache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
-                if (!await Connector.BlobForUrlExist(new Uri(newUri)))
+                var uri = new Uri(newUri);
+                if (!await Connector.BlobForUrlExist(uri))
                 {
-                    var error = "Requested data doesn't exist";
+                    const string error = "Requested data doesn't exist";
                     _logger.LogError(error, newUri);
                     return NotFound(error);
                 }
-                var dataForSensor = await Connector.DownloadDeviceDataForSensor(new Uri(newUri));
+                var dataForSensor = await Connector.DownloadDeviceDataForSensor(uri);
                 result.Add(sensorName,dataForSensor);
             }
 

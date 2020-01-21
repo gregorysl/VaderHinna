@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
@@ -47,12 +46,6 @@ namespace VaderHinna.AzureService
             return new AzureCache { BaseUrl = _baseUrl, File = file, Devices = devicesList };
         }
 
-        public async Task<string> DownloadTextByBlobUri(Uri uri)
-        {
-            var blob = new CloudBlockBlob(uri);
-            var content = await blob.DownloadTextAsync();
-            return content;
-        }
         public async Task<string> DownloadTextByAppendUri(Uri uri)
         {
             var blob = new CloudAppendBlob(uri);

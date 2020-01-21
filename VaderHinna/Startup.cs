@@ -30,6 +30,7 @@ namespace VaderHinna
             services.AddTransient<ICsvService, CsvService>();
             services.AddTransient<IAzureConnector>(s =>
                 new AzureConnector(connectionString, rootDir, discoveryFile, s.GetService<ICsvService>()));
+            services.AddMemoryCache();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using VaderHinna.Model;
 using VaderHinna.Model.Interface;
@@ -15,13 +16,37 @@ namespace VaderHinna.Controllers
     [Route("api/v{version:apiVersion}/[controller]")]
     public class DevicesController : ControllerBase
     {
+        private readonly MemoryCacheEntryOptions _cacheOption = new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = (DateTime.Now.AddMinutes(30) - DateTime.Now)
+        };
         private readonly ILogger<DevicesController> _logger;
         private IAzureConnector Connector { get; }
+        private readonly IMemoryCache _memoryCache;
+        private string CACHE_KEY = "AzureCache";
 
-        public DevicesController(ILogger<DevicesController> logger, IAzureConnector connector)
+        public AzureCache Cache
+        {
+            get
+            {
+                if (_memoryCache.Get(CACHE_KEY) != null)
+                {
+                    return (AzureCache)_memoryCache.Get(CACHE_KEY);
+                }
+
+                var azureCache = Connector.DiscoveryMode().Result;
+                _memoryCache.Set(CACHE_KEY, azureCache, _cacheOption);
+                return azureCache;
+            }
+        }
+
+        public DevicesController(ILogger<DevicesController> logger, IAzureConnector connector,IMemoryCache memoryCache)
         {
             Connector = connector;
             _logger = logger;
+            _memoryCache = memoryCache;
+
+
         }
 
         [HttpGet]
@@ -35,14 +60,13 @@ namespace VaderHinna.Controllers
                 return BadRequest(errorMessage);
             }
 
-            var azureCache = Connector.DiscoveryMode().Result;
-            var sensorsToDownload = azureCache.Devices
+            var sensorsToDownload = Cache.Devices
                 .Single(x => x.Id == deviceId).Sensors
                 .Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
             var result = new Dictionary<string, List<SensorData>>();
             foreach (var sensorName in sensorsToDownload)
             {
-                var newUri = $"{azureCache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
+                var newUri = $"{Cache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
                 if (!await Connector.BlobForUrlExist(new Uri(newUri)))
                 {
                     var error = "Requested data doesn't exist";
@@ -63,12 +87,11 @@ namespace VaderHinna.Controllers
             if (!isValidDate) return "Date is not in correct format";
             if (date > DateTime.Today) return "Date cannot be set in future";
 
-            var azureCache = Connector.DiscoveryMode().Result;
-            var isValidDevice = azureCache.Devices.Any(x => x.Id == deviceId);
+            var isValidDevice = Cache.Devices.Any(x => x.Id == deviceId);
             if (!isValidDevice) return "Unknown device Id";
 
             var isValidSensor = string.IsNullOrEmpty(sensor) ||
-                                 azureCache.Devices.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
+                                Cache.Devices.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
             if (!isValidSensor) return "Sensor not recognized for this device";
             
             return null;

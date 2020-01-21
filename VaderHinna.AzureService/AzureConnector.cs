@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -11,52 +12,41 @@ namespace VaderHinna.AzureService
 {
     public class AzureConnector : IAzureConnector
     {
-        private string _name = "iotbackend";
-        private string _filename = "metadata.csv";
-        private readonly CloudBlobClient _cloudBlobClient;
+        private readonly CloudStorageAccount _storageAccount;
         private readonly ICsvService _csvService;
         private readonly string _baseUrl;
-        public AzureConnector(string connectionString, ICsvService csvService)
+        private readonly string _discoveryFile;
+        public AzureConnector(string connectionString, string rootDir, string discoveryFile, ICsvService csvService)
         {
             _csvService = csvService;
-            var storageAccount = CloudStorageAccount.Parse(connectionString);
-            _baseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri}{_name}";
-            _cloudBlobClient = storageAccount.CreateCloudBlobClient();
+            _discoveryFile = discoveryFile;
+
+            _storageAccount = CloudStorageAccount.Parse(connectionString);
+            _baseUrl = $"{_storageAccount.BlobStorageUri.PrimaryUri}{rootDir}";
         }
         
         public async Task<AzureCache> DiscoveryMode()
         {
-            var list = await GetFilesFromDirectory(_cloudBlobClient, _name);
-            var files = list.Results.Where(x => x.GetType() == typeof(CloudBlockBlob))
-                .Cast<CloudBlockBlob>()
-                .Select(x => new AzureFile { Length = x.StreamWriteSizeInBytes, Name = x.Name, Uri = x.Uri })
-                .ToList();
-
-            if (files.Any(x => x.Name == _filename))
+            var url = $"{_baseUrl}/{_discoveryFile}";
+            var uri = new Uri(url);
+            if (!await BlobForUrlExist(uri))
             {
-                var file = files.Single(x => x.Name == _filename);
-                var cache = await CreateCache(file);
-                return cache;
+                return null;
             }
 
-            return null;
-        }
-        
-        private async Task<AzureCache> CreateCache(AzureFile file)
-        {
-            var converted = await DownloadTextByBlobUri(file.Uri);
-            var devicesList = _csvService.ParseMetadataInfoForDevices(converted);
+            var cloudBlobClient = _storageAccount.CreateCloudBlobClient();
+            var rootMetadataRef = await cloudBlobClient.GetBlobReferenceFromServerAsync(uri);
+            await rootMetadataRef.FetchAttributesAsync();
+                
+            var stream = new MemoryStream();
+            await rootMetadataRef.DownloadToStreamAsync(stream);
+            var devicesList = _csvService.ParseMetadataInfoFromStream(stream);
+
+            var file = new AzureFile { Length = rootMetadataRef.Properties.Length, Name = rootMetadataRef.Name, Uri = rootMetadataRef.Uri };
+                
             return new AzureCache { BaseUrl = _baseUrl, File = file, Devices = devicesList };
         }
 
-
-        private static async Task<BlobResultSegment> GetFilesFromDirectory(CloudBlobClient cloudBlobClient, string name)
-        {
-            var backupContainer = cloudBlobClient.GetContainerReference(name);
-            var list = await backupContainer.ListBlobsSegmentedAsync(null);
-            return list;
-        }
-        
         public async Task<string> DownloadTextByBlobUri(Uri uri)
         {
             var blob = new CloudBlockBlob(uri);

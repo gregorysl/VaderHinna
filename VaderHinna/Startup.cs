@@ -21,11 +21,15 @@ namespace VaderHinna
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = Configuration["ConnectionString"];
+            var rootDir = Configuration["RootDirectory"];
+            var discoveryFile = Configuration["DiscoveryFile"];
+
             services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new DateTimeJsonConverter()));
             services.AddApiVersioning();
             services.AddTransient<ICsvService, CsvService>();
-            services.AddTransient<IAzureConnector>(s => new AzureConnector(connectionString, s.GetService<ICsvService>()));
+            services.AddTransient<IAzureConnector>(s =>
+                new AzureConnector(connectionString, rootDir, discoveryFile, s.GetService<ICsvService>()));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

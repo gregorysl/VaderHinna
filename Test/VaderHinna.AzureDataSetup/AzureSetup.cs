@@ -5,22 +5,21 @@ namespace VaderHinna.AzureDataSetup
 {
     public class AzureSetup
     {
-        private readonly string _connectionString;
-        private readonly string _containerName;
-        private readonly string _device;
+        public string ConnectionString = "AccountName=devstoreaccount1;" +
+                                         "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;" +
+                                         "DefaultEndpointsProtocol=http;" +
+                                         "BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;" +
+                                         "QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;" +
+                                         "TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;";
+        public string ContainerName = "iotbackend";
+        public string Device = "dockan";
 
         private const string Date = "2019-01-10";
         private const string Csv = ".csv";
 
-        public AzureSetup(string connectionString, string containerName, string device)
-        {
-            _connectionString = connectionString;
-            _containerName = containerName;
-            _device = device;
-        }
         public void Setup()
         {
-            var blobContainerClient = new BlobContainerClient(_connectionString, _containerName);
+            var blobContainerClient = new BlobContainerClient(ConnectionString, ContainerName);
             blobContainerClient.CreateIfNotExists();
 
             var assembly = Assembly.GetExecutingAssembly();
@@ -28,9 +27,9 @@ namespace VaderHinna.AzureDataSetup
             var sensors = GetTestSensors();
             foreach (var sensor in sensors)
             {
-                var fullname = $"{currentNamespace}.Resources.{_device}.{sensor}.{Date}{Csv}";
+                var fullname = $"{currentNamespace}.Resources.{Device}.{sensor}.{Date}{Csv}";
                 var stream = assembly.GetManifestResourceStream(fullname);
-                var file = new BlobClient(_connectionString, _containerName, $"{_device}/{sensor}/{Date}{Csv}");
+                var file = new BlobClient(ConnectionString, ContainerName, $"{Device}/{sensor}/{Date}{Csv}");
                 if (!file.Exists())
                 {
                     file.Upload(stream);
@@ -45,8 +44,8 @@ namespace VaderHinna.AzureDataSetup
 
         public void Clear()
         {
-            var blobServiceClient = new BlobServiceClient(_connectionString);
-            blobServiceClient.DeleteBlobContainer(_containerName);
+            var blobServiceClient = new BlobServiceClient(ConnectionString);
+            blobServiceClient.DeleteBlobContainer(ContainerName);
         }
     }
 }

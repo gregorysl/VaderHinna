@@ -5,9 +5,17 @@ VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaderHinna", "VaderHinna\VaderHinna.csproj", "{2B152D02-4946-4E71-A369-C1AAF466A703}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaderHinna.AzureService", "VaderHinna.AzureService\VaderHinna.AzureService.csproj", "{B454967C-8EB0-48F8-89AC-A18D554ECDF4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaderHinna.AzureService", "VaderHinna.AzureService\VaderHinna.AzureService.csproj", "{B454967C-8EB0-48F8-89AC-A18D554ECDF4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaderHinna.Model", "VaderHinna.Model\VaderHinna.Model.csproj", "{B36DF886-D268-4148-A4C4-292BB8DEB676}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaderHinna.Model", "VaderHinna.Model\VaderHinna.Model.csproj", "{B36DF886-D268-4148-A4C4-292BB8DEB676}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{6216761C-E636-4258-8A9F-7DF28106472C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VaderHinna.AzureDataSetup", "Test\VaderHinna.AzureDataSetup\VaderHinna.AzureDataSetup.csproj", "{DC3DCADE-FD89-429F-8DC5-79B02153FE30}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaderHinna.AzureService.Tests", "Test\VaderHinna.AzureService.Tests\VaderHinna.AzureService.Tests.csproj", "{1CD2B6C8-62FD-4C7A-BDA4-4CB95D8F48CE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VaderHinna.LocalSetup", "Test\VaderHinna.LocalSetup\VaderHinna.LocalSetup.csproj", "{ED93DF43-8414-4A49-BF9B-4978C15E5E1E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +35,26 @@ Global
 		{B36DF886-D268-4148-A4C4-292BB8DEB676}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B36DF886-D268-4148-A4C4-292BB8DEB676}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B36DF886-D268-4148-A4C4-292BB8DEB676}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC3DCADE-FD89-429F-8DC5-79B02153FE30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC3DCADE-FD89-429F-8DC5-79B02153FE30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC3DCADE-FD89-429F-8DC5-79B02153FE30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC3DCADE-FD89-429F-8DC5-79B02153FE30}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD2B6C8-62FD-4C7A-BDA4-4CB95D8F48CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD2B6C8-62FD-4C7A-BDA4-4CB95D8F48CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD2B6C8-62FD-4C7A-BDA4-4CB95D8F48CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD2B6C8-62FD-4C7A-BDA4-4CB95D8F48CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED93DF43-8414-4A49-BF9B-4978C15E5E1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED93DF43-8414-4A49-BF9B-4978C15E5E1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED93DF43-8414-4A49-BF9B-4978C15E5E1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED93DF43-8414-4A49-BF9B-4978C15E5E1E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DC3DCADE-FD89-429F-8DC5-79B02153FE30} = {6216761C-E636-4258-8A9F-7DF28106472C}
+		{1CD2B6C8-62FD-4C7A-BDA4-4CB95D8F48CE} = {6216761C-E636-4258-8A9F-7DF28106472C}
+		{ED93DF43-8414-4A49-BF9B-4978C15E5E1E} = {6216761C-E636-4258-8A9F-7DF28106472C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A4E0AB9-F136-48C9-876F-E455E50E2367}

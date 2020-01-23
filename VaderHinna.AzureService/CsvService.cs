@@ -24,7 +24,7 @@ namespace VaderHinna.AzureService
         public List<AzureDevice> ParseMetadataInfoFromStream(Stream stream)
         {
             stream.Position = 0;
-            StreamReader streamReader = new StreamReader(stream);
+            var streamReader = new StreamReader(stream);
             using var csv = new CsvReader(streamReader, CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
             csv.Configuration.Delimiter = ";";

@@ -18,7 +18,7 @@ namespace VaderHinna.Controllers
     {
         private readonly MemoryCacheEntryOptions _cacheOption = new MemoryCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = (DateTime.Now.AddMinutes(30) - DateTime.Now)
+            AbsoluteExpirationRelativeToNow = DateTime.Now.AddMinutes(30) - DateTime.Now
         };
         private readonly ILogger<DevicesController> _logger;
         private IAzureConnector Connector { get; }

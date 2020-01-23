@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Test\VaderHinna.AzureDataSetup\VaderHinna.AzureDataSetup.csproj" />
+    <ProjectReference Include="..\VaderHinna.AzureDataSetup\VaderHinna.AzureDataSetup.csproj" />
   </ItemGroup>
 
 </Project>

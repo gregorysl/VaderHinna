@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -49,13 +48,6 @@ namespace VaderHinna.AzureService
             var blob = new CloudAppendBlob(uri);
             var content = await blob.DownloadTextAsync();
             return content;
-        }
-
-        public async Task<List<SensorData>> DownloadDeviceDataForSensor(Uri uri)
-        {
-            var data = await DownloadTextByAppendUri(uri);
-            var devicesList = _csvService.ReadAndParseSensorData(data);
-            return devicesList;
         }
 
         public async Task<bool> BlobForUrlExist(Uri uri)

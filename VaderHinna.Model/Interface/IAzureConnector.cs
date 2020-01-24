@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace VaderHinna.Model.Interface
@@ -8,7 +7,6 @@ namespace VaderHinna.Model.Interface
     {
         Task<AzureCache> DiscoveryMode();
         Task<string> DownloadTextByAppendUri(Uri uri);
-        Task<List<SensorData>> DownloadDeviceDataForSensor(Uri uri);
         Task<bool> BlobForUrlExist(Uri uri);
     }
 }

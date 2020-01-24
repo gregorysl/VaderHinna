@@ -21,6 +21,7 @@ namespace VaderHinna.Controllers
             AbsoluteExpirationRelativeToNow = DateTime.Now.AddMinutes(30) - DateTime.Now
         };
         private readonly ILogger<DevicesController> _logger;
+        private readonly ICsvService _csvService;
         private IAzureConnector Connector { get; }
         private readonly IMemoryCache _memoryCache;
         private string CACHE_KEY = "AzureCache";
@@ -40,12 +41,12 @@ namespace VaderHinna.Controllers
             }
         }
 
-        public DevicesController(ILogger<DevicesController> logger, IAzureConnector connector,IMemoryCache memoryCache)
+        public DevicesController(ILogger<DevicesController> logger, IAzureConnector connector, IMemoryCache memoryCache, ICsvService csvService)
         {
             Connector = connector;
             _logger = logger;
             _memoryCache = memoryCache;
-
+            _csvService = csvService;
 
         }
 
@@ -74,8 +75,8 @@ namespace VaderHinna.Controllers
                     _logger.LogError(error, newUri);
                     return NotFound(error);
                 }
-                var dataForSensor = await Connector.DownloadDeviceDataForSensor(uri);
-                result.Add(sensorName,dataForSensor);
+                var dataForSensor = await DownloadDeviceDataForSensor(uri);
+                result.Add(sensorName, dataForSensor);
             }
 
             return Ok(result);
@@ -94,8 +95,16 @@ namespace VaderHinna.Controllers
             var isValidSensor = string.IsNullOrEmpty(sensor) ||
                                 Cache.Devices.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
             if (!isValidSensor) return "Sensor not recognized for this device";
-            
+
             return null;
         }
+
+        public async Task<List<SensorData>> DownloadDeviceDataForSensor(Uri uri)
+        {
+            var data = await Connector.DownloadTextByAppendUri(uri);
+            var devicesList = _csvService.ReadAndParseSensorData(data);
+            return devicesList;
+        }
+
     }
 }

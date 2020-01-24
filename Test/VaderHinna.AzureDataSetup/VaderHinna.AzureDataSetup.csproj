@@ -7,6 +7,7 @@
   <ItemGroup>
     <None Remove="Resources\dockan\humidity\2019-01-10.csv" />
     <None Remove="Resources\dockan\rainfall\2019-01-10.csv" />
+    <None Remove="Resources\dockan\SmallSample.txt" />
     <None Remove="Resources\dockan\temperature\2019-01-10.csv" />
   </ItemGroup>
 
@@ -15,6 +16,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\dockan\rainfall\2019-01-10.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\dockan\SmallSample.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\dockan\temperature\2019-01-10.csv">

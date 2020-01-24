@@ -37,3 +37,7 @@ Find out past or present values of your IoT device sensor with this API
 * **VaderHinna.Test** Testpack to check functionality of Service
 
 **Be sure to run Azure Storage Emulator first, otherwise tests will fail**
+
+## Limitations
+
+- Azure Storage Emulator doesn't support AppendBlobs, and this piece isn't covered by tests

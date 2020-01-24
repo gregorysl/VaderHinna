@@ -10,7 +10,6 @@ namespace VaderHinna.AzureService
 {
     public class AzureConnector : IAzureConnector
     {
-        private readonly CloudStorageAccount _storageAccount;
         private readonly CloudBlobClient _cloudBlobClient;
         private readonly ICsvService _csvService;
         public readonly string BaseUrl;
@@ -20,9 +19,9 @@ namespace VaderHinna.AzureService
             _csvService = csvService;
             _discoveryFile = discoveryFile;
 
-            _storageAccount = CloudStorageAccount.Parse(connectionString);
-            _cloudBlobClient = _storageAccount.CreateCloudBlobClient();
-            BaseUrl = $"{_storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
+            var storageAccount = CloudStorageAccount.Parse(connectionString);
+            _cloudBlobClient = storageAccount.CreateCloudBlobClient();
+            BaseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
         }
         
         public async Task<AzureCache> DiscoveryMode()
@@ -45,7 +44,7 @@ namespace VaderHinna.AzureService
 
         public async Task<string> DownloadTextByAppendUri(Uri uri)
         {
-            var blob = new CloudAppendBlob(uri);
+            var blob = new CloudAppendBlob(uri,_cloudBlobClient);
             var content = await blob.DownloadTextAsync();
             return content;
         }

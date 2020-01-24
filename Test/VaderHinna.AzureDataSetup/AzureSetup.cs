@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Specialized;
 
 namespace VaderHinna.AzureDataSetup
 {
@@ -35,6 +36,13 @@ namespace VaderHinna.AzureDataSetup
                     file.Upload(stream);
                 }
             }
+            //TODO: for now Azure Storage Emulator doesn't support Append Blobs. Uncomment when testing using other connectionstring
+            //var smallFileStream = assembly.GetManifestResourceStream($"{currentNamespace}.Resources.{Device}.SmallSample.txt");
+            //var smallFile = new AppendBlobClient(ConnectionString, ContainerName, $"{Device}/SmallSample.txt");
+            //if (!smallFile.Exists())
+            //{
+            //    smallFile.AppendBlock(smallFileStream);
+            //}
         }
 
         public string[] GetTestSensors()

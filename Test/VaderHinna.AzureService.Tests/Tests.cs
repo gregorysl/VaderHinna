@@ -26,16 +26,24 @@ namespace VaderHinna.AzureService.Tests
         [Test]
         public async Task BlobForUrlExist_DoesntExisit()
         {
-            var uri = new Uri($"{_azureConnector.BaseUrl}/randomBlob");
+            var uri = new Uri($"{_azureConnector.BaseUrl}randomBlob");
             var check = await _azureConnector.BlobForUrlExist(uri);
             Assert.AreEqual(false, check);
         }
-
+        
         [Test]
         public async Task BlobForUrlExist_Exisit()
         {
-            var uri = new Uri($"{_azureConnector.BaseUrl}/dockan/humidity/2019-01-10.csv");
+            var uri = new Uri($"{_azureConnector.BaseUrl}dockan/humidity/2019-01-10.csv");
             var check = await _azureConnector.BlobForUrlExist(uri);
+            Assert.AreEqual(true, check);
+        }
+        
+        [Test,Ignore("for now Azure Storage Emulator doesn't support Append Blobs. Unignore when testing using other connectionstring")]
+        public async Task DownloadTextByAppendUri_Exisit()
+        {
+            var uri = new Uri($"{_azureConnector.BaseUrl}dockan/SmallSample.txt");
+            var check = await _azureConnector.DownloadTextByAppendUri(uri);
             Assert.AreEqual(true, check);
         }
         

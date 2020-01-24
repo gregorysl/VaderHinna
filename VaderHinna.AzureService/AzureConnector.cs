@@ -13,7 +13,7 @@ namespace VaderHinna.AzureService
     {
         private readonly CloudBlobClient _cloudBlobClient;
         private readonly ICsvService _csvService;
-        private readonly string BaseUrl;
+        private readonly string _baseUrl;
         private readonly string _discoveryFile;
         public AzureConnector(string connectionString, string rootDir, string discoveryFile, ICsvService csvService)
         {
@@ -22,15 +22,15 @@ namespace VaderHinna.AzureService
 
             var storageAccount = CloudStorageAccount.Parse(connectionString);
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
-            BaseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
+            _baseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
         }
 
 
-        public string CreateUrl(string end) => $"{BaseUrl.TrimEnd('/')}/{end}";
+        public string CreateUrl(string end) => $"{_baseUrl.TrimEnd('/')}/{end}";
 
         public async Task<List<AzureDevice>> DeviceDiscovery()
         {
-            var url = $"{BaseUrl}{_discoveryFile}";
+            var url = $"{_baseUrl}{_discoveryFile}";
             var uri = new Uri(url);
             if (!await BlobForUrlExist(uri))
             {

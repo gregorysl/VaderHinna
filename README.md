@@ -11,15 +11,13 @@ Find out past or present values of your IoT device sensor with this API
 
 1. Run project in Visual Studio as Admin
 2. Right click main (VaderHinna) project and select "Manage User Secrets"
-3. Paste following to opened secrets.json and fill data
+3. Paste following to opened secrets.json and create JSon object with following keys
 
-```JSON
-{
-  "ConnectionString": "",
-  "RootDirectory": "",
-  "DiscoveryFile": ""
-}
-```
+| Property         | Description                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| ConnectionString | Connection string in [Sas](https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview) format |
+| RootDirectory    | Container name where device data is located                                                                   |
+| DiscoveryFile    | [optional] csv file that has list of available devices and sensors                                            |
 
 4. Save file
 5. Build solution
@@ -27,17 +25,15 @@ Find out past or present values of your IoT device sensor with this API
 
 ## Projects in solution
 
-- **VaderHinna** main API project.
-- **VaderHinna.Model** main API project.
-
-* **VaderHinna.AzureDataSetup**
+- **VaderHinna** main API project
+- **VaderHinna.Model** Class Library for all interfaces and DTOs
+- **VaderHinna.AzureService** place for additional services, to handle Azure and Csv data
+- **VaderHinna.AzureDataSetup**
   Class library that has options to set up data on local Azure Storage Emulator
-
-* **VaderHinna.LocalSetup**
+- **VaderHinna.LocalSetup**
   If you want to setup Blob Container on your local PC, launch this project
-* **VaderHinna.Test** Testpack to check functionality of Service
-
-**Be sure to run Azure Storage Emulator first, otherwise tests will fail**
+- **VaderHinna.Test** Testpack to check functionality of Service
+  **Be sure to run Azure Storage Emulator first, otherwise tests will fail**
 
 ## Limitations
 

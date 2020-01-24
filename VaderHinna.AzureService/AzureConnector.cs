@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.WindowsAzure.Storage;
@@ -12,7 +13,7 @@ namespace VaderHinna.AzureService
     {
         private readonly CloudBlobClient _cloudBlobClient;
         private readonly ICsvService _csvService;
-        public readonly string BaseUrl;
+        private readonly string BaseUrl;
         private readonly string _discoveryFile;
         public AzureConnector(string connectionString, string rootDir, string discoveryFile, ICsvService csvService)
         {
@@ -23,8 +24,11 @@ namespace VaderHinna.AzureService
             _cloudBlobClient = storageAccount.CreateCloudBlobClient();
             BaseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
         }
-        
-        public async Task<AzureCache> DeviceDiscovery()
+
+
+        public string CreateUrl(string end) => $"{BaseUrl.TrimEnd('/')}/{end}";
+
+        public async Task<List<AzureDevice>> DeviceDiscovery()
         {
             var url = $"{BaseUrl}{_discoveryFile}";
             var uri = new Uri(url);
@@ -39,7 +43,7 @@ namespace VaderHinna.AzureService
             await rootMetadataRef.DownloadToStreamAsync(stream);
             var devicesList = _csvService.ParseMetadataInfoFromStream(stream);
     
-            return new AzureCache { BaseUrl = BaseUrl, Devices = devicesList };
+            return devicesList;
         }
 
         public async Task<string> DownloadTextByAppendUri(Uri uri)

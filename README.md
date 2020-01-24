@@ -28,6 +28,7 @@ Find out past or present values of your IoT device sensor with this API
 ## Projects in solution
 
 - **VaderHinna** main API project.
+- **VaderHinna.Model** main API project.
 
 * **VaderHinna.AzureDataSetup**
   Class library that has options to set up data on local Azure Storage Emulator

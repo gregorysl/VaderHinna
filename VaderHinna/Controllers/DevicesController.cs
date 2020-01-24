@@ -26,13 +26,13 @@ namespace VaderHinna.Controllers
         private readonly IMemoryCache _memoryCache;
         private string CACHE_KEY = "AzureCache";
 
-        public AzureCache Cache
+        public List<AzureDevice> DeviceList
         {
             get
             {
                 if (_memoryCache.Get(CACHE_KEY) != null)
                 {
-                    return (AzureCache)_memoryCache.Get(CACHE_KEY);
+                    return (List<AzureDevice>)_memoryCache.Get(CACHE_KEY);
                 }
 
                 var azureCache = Connector.DeviceDiscovery().Result;
@@ -61,13 +61,13 @@ namespace VaderHinna.Controllers
                 return BadRequest(errorMessage);
             }
 
-            var sensorsToDownload = Cache.Devices
+            var sensorsToDownload = DeviceList
                 .Single(x => x.Id == deviceId).Sensors
                 .Where(x => string.IsNullOrEmpty(sensor) || x == sensor).ToList();
             var result = new Dictionary<string, List<SensorData>>();
             foreach (var sensorName in sensorsToDownload)
             {
-                var newUri = $"{Cache.BaseUrl}/{deviceId}/{sensorName}/{date}.csv";
+                var newUri = Connector.CreateUrl($"{deviceId}/{sensorName}/{date}.csv");
                 var uri = new Uri(newUri);
                 if (!await Connector.BlobForUrlExist(uri))
                 {
@@ -89,11 +89,11 @@ namespace VaderHinna.Controllers
             if (!isValidDate) return "Date is not in correct format";
             if (date > DateTime.Today) return "Date cannot be set in future";
 
-            var isValidDevice = Cache.Devices.Any(x => x.Id == deviceId);
+            var isValidDevice = DeviceList.Any(x => x.Id == deviceId);
             if (!isValidDevice) return "Unknown device Id";
 
             var isValidSensor = string.IsNullOrEmpty(sensor) ||
-                                Cache.Devices.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
+                                DeviceList.Single(x => x.Id == deviceId).Sensors.Any(x => x == sensor);
             if (!isValidSensor) return "Sensor not recognized for this device";
 
             return null;

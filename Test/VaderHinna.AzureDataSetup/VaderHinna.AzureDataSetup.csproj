@@ -9,6 +9,13 @@
     <None Remove="Resources\dockan\rainfall\2019-01-10.csv" />
     <None Remove="Resources\dockan\SmallSample.txt" />
     <None Remove="Resources\dockan\temperature\2019-01-10.csv" />
+    <None Remove="Resources\metadata.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\metadata.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

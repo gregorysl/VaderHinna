@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using VaderHinna.AzureDataSetup;
+using VaderHinna.Model;
 
 namespace VaderHinna.AzureService.Tests
 {
@@ -52,6 +55,22 @@ namespace VaderHinna.AzureService.Tests
         {
             var devices = await _azureConnector.DeviceDiscovery();
             Assert.AreEqual(null, devices);
+        }
+
+        [Test]
+        public async Task DeviceDiscovery_Exist()
+        {
+            _azureConnector = new AzureConnector(_azureSetup.ConnectionString, _azureSetup.ContainerName, "metadata.csv",
+                _csvService);
+            var result = await _azureConnector.DeviceDiscovery();
+            var sensors = _azureSetup.GetTestSensors().ToList().OrderBy(x => x);
+            Assert.NotNull(result);
+            Assert.AreEqual(result.BaseUrl, _azureConnector.BaseUrl, "Base Url");
+            Assert.AreEqual(1, result.Devices.Count,"Device count");
+            Assert.AreEqual("dockan", result.Devices.First().Id,"Device Id");
+            Assert.AreEqual(3, result.Devices.First().Sensors.Count,"Device Sensors count");
+            Assert.AreEqual("dockan", result.Devices.First().Id,"Device Id");
+            Assert.AreEqual(sensors, result.Devices.First().Sensors.OrderBy(x=>x),"List of Sensors");
         }
 
         [TearDown]

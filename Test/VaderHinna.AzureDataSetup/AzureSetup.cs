@@ -43,6 +43,14 @@ namespace VaderHinna.AzureDataSetup
             //{
             //    smallFile.AppendBlock(smallFileStream);
             //}
+            
+            var metadataResource = $"{currentNamespace}.Resources.metadata{Csv}";
+            var metadataStream = assembly.GetManifestResourceStream(metadataResource);
+            var metadataFile = new BlobClient(ConnectionString, ContainerName, $"metadata{Csv}");
+            if (!metadataFile.Exists())
+            {
+                metadataFile.Upload(metadataStream);
+            }
         }
 
         public string[] GetTestSensors()

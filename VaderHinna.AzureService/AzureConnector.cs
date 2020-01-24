@@ -12,8 +12,9 @@ namespace VaderHinna.AzureService
     public class AzureConnector : IAzureConnector
     {
         private readonly CloudStorageAccount _storageAccount;
+        private readonly CloudBlobClient _cloudBlobClient;
         private readonly ICsvService _csvService;
-        private readonly string _baseUrl;
+        public readonly string BaseUrl;
         private readonly string _discoveryFile;
         public AzureConnector(string connectionString, string rootDir, string discoveryFile, ICsvService csvService)
         {
@@ -21,26 +22,26 @@ namespace VaderHinna.AzureService
             _discoveryFile = discoveryFile;
 
             _storageAccount = CloudStorageAccount.Parse(connectionString);
-            _baseUrl = $"{_storageAccount.BlobStorageUri.PrimaryUri}{rootDir}";
+            _cloudBlobClient = _storageAccount.CreateCloudBlobClient();
+            BaseUrl = $"{_storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
         }
         
         public async Task<AzureCache> DiscoveryMode()
         {
-            var url = $"{_baseUrl}/{_discoveryFile}";
+            var url = $"{BaseUrl}{_discoveryFile}";
             var uri = new Uri(url);
             if (!await BlobForUrlExist(uri))
             {
                 return null;
             }
 
-            var cloudBlobClient = _storageAccount.CreateCloudBlobClient();
-            var rootMetadataRef = await cloudBlobClient.GetBlobReferenceFromServerAsync(uri);
+            var rootMetadataRef = await _cloudBlobClient.GetBlobReferenceFromServerAsync(uri);
                 
             var stream = new MemoryStream();
             await rootMetadataRef.DownloadToStreamAsync(stream);
             var devicesList = _csvService.ParseMetadataInfoFromStream(stream);
     
-            return new AzureCache { BaseUrl = _baseUrl, Devices = devicesList };
+            return new AzureCache { BaseUrl = BaseUrl, Devices = devicesList };
         }
 
         public async Task<string> DownloadTextByAppendUri(Uri uri)
@@ -59,7 +60,7 @@ namespace VaderHinna.AzureService
 
         public async Task<bool> BlobForUrlExist(Uri uri)
         {
-            var cloudBlob = new CloudBlob(uri);
+            var cloudBlob = new CloudBlob(uri, _cloudBlobClient);
             return await cloudBlob.ExistsAsync();
         }
     }

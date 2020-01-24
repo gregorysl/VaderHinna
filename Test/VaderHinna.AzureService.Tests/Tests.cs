@@ -1,3 +1,5 @@
+using System;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using VaderHinna.AzureDataSetup;
 
@@ -6,20 +8,35 @@ namespace VaderHinna.AzureService.Tests
     public class Tests
     {
         private readonly AzureSetup _azureSetup;
+        private AzureConnector _azureConnector;
+        private readonly CsvService _csvService;
         public Tests()
         {
             _azureSetup = new AzureSetup();
+            _csvService = new CsvService();
         }
         [SetUp]
         public void Setup()
         {
             _azureSetup.Setup();
+            _azureConnector = new AzureConnector(_azureSetup.ConnectionString, _azureSetup.ContainerName, null,
+                _csvService);
+        }
+        
+        [Test]
+        public async Task BlobForUrlExist_DoesntExisit()
+        {
+            var uri = new Uri($"{_azureConnector.BaseUrl}/randomBlob");
+            var check = await _azureConnector.BlobForUrlExist(uri);
+            Assert.AreEqual(false, check);
         }
 
         [Test]
-        public void Test1()
+        public async Task BlobForUrlExist_Exisit()
         {
-            Assert.AreEqual(1,1);
+            var uri = new Uri($"{_azureConnector.BaseUrl}/dockan/humidity/2019-01-10.csv");
+            var check = await _azureConnector.BlobForUrlExist(uri);
+            Assert.AreEqual(true, check);
         }
         
         [TearDown]

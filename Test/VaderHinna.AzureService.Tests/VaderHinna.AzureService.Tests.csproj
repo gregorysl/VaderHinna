@@ -15,6 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\VaderHinna.AzureService\VaderHinna.AzureService.csproj" />
+    <ProjectReference Include="..\..\VaderHinna.Model\VaderHinna.Model.csproj" />
     <ProjectReference Include="..\VaderHinna.AzureDataSetup\VaderHinna.AzureDataSetup.csproj" />
   </ItemGroup>
 

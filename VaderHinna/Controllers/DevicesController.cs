@@ -35,7 +35,7 @@ namespace VaderHinna.Controllers
                     return (AzureCache)_memoryCache.Get(CACHE_KEY);
                 }
 
-                var azureCache = Connector.DiscoveryMode().Result;
+                var azureCache = Connector.DeviceDiscovery().Result;
                 _memoryCache.Set(CACHE_KEY, azureCache, _cacheOption);
                 return azureCache;
             }

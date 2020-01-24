@@ -24,7 +24,7 @@ namespace VaderHinna.AzureService
             BaseUrl = $"{storageAccount.BlobStorageUri.PrimaryUri.ToString().TrimEnd('/')}/{rootDir}/";
         }
         
-        public async Task<AzureCache> DiscoveryMode()
+        public async Task<AzureCache> DeviceDiscovery()
         {
             var url = $"{BaseUrl}{_discoveryFile}";
             var uri = new Uri(url);
@@ -52,6 +52,7 @@ namespace VaderHinna.AzureService
         public async Task<bool> BlobForUrlExist(Uri uri)
         {
             var cloudBlob = new CloudBlob(uri, _cloudBlobClient);
+            if (cloudBlob.Container.Uri.ToString().TrimEnd('/') == uri.ToString().TrimEnd('/')) return false;
             return await cloudBlob.ExistsAsync();
         }
     }

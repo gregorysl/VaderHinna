@@ -5,7 +5,7 @@ namespace VaderHinna.Model.Interface
 {
     public interface IAzureConnector
     {
-        Task<AzureCache> DiscoveryMode();
+        Task<AzureCache> DeviceDiscovery();
         Task<string> DownloadTextByAppendUri(Uri uri);
         Task<bool> BlobForUrlExist(Uri uri);
     }

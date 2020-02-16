@@ -13,7 +13,8 @@ namespace VaderHinna.AzureService
     {
         public List<SensorData> ReadAndParseSensorData(string data)
         {
-            using var csv = new CsvReader(new StringReader(data), CultureInfo.InvariantCulture);
+            using var streamReader = new StreamReader(data);
+            using var csv = new CsvReader(streamReader, CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
             csv.Configuration.Delimiter = ";";
             csv.Configuration.RegisterClassMap<SensorDataMap>();
@@ -24,7 +25,7 @@ namespace VaderHinna.AzureService
         public List<AzureDevice> ParseMetadataInfoFromStream(Stream stream)
         {
             stream.Position = 0;
-            var streamReader = new StreamReader(stream);
+            using var streamReader = new StreamReader(stream);
             using var csv = new CsvReader(streamReader, CultureInfo.InvariantCulture);
             csv.Configuration.HasHeaderRecord = false;
             csv.Configuration.Delimiter = ";";

@@ -38,8 +38,8 @@ namespace VaderHinna.AzureService
             }
 
             var rootMetadataRef = await _cloudBlobClient.GetBlobReferenceFromServerAsync(uri);
-                
-            var stream = new MemoryStream();
+
+            await using var stream = new MemoryStream();
             await rootMetadataRef.DownloadToStreamAsync(stream);
             var devicesList = _csvService.ParseMetadataInfoFromStream(stream);
     

@@ -5,7 +5,7 @@
     <UserSecretsId>5d5044f5-d923-49ba-9737-40a2b215f8ba</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Storage.Blobs" Version="12.2.0" />
+    <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
